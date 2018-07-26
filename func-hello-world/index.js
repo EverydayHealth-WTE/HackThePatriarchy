@@ -7,7 +7,6 @@ exports.main = function(lambdaReq, success, fail) {
     try {
                 
         ValidateRequestParams(lambdaReq)
-            .then(ProcessText)
             .then((req) => {
                 lambdaReq.response.body = JSON.stringify(req.response);
                 success(lambdaReq.response);
@@ -19,29 +18,13 @@ exports.main = function(lambdaReq, success, fail) {
     }
 };
 
-
-function ProcessText(req) {
-    return new Promise(function(resolve, reject) {
-        try {
-            // do something here
-            return resolve(req)
-        } catch (e) {
-            return reject(e);
-        }
-    });
-}
-
 function ValidateRequestParams(lambdaReq) {
     return new Promise(function(resolve, reject) {
         try {
 
-            const reqParams = { };
-            try {
-                reqParams.FilterTextRequest = lambdaReq.getBodyJSON();
-            } catch (e) {
-                console.log(e);
-                return reject("Error: Could not parse request object.");
-            }
+            const reqParams = { 
+                response : "Hello World"
+            };
 
             return resolve(reqParams);
 
