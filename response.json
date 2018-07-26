@@ -1,0 +1,26 @@
+{
+    "originalText": "That girl is so shrill.",
+    "problematicTerms": {
+        "shrill": {
+            "startIndex": 15,
+            "endIndex": 21,
+            "problemPoints": 50,
+            "GNReplacement": "",
+            "femReplacement": "",
+            "warningMessage": "This is not OK!"
+        }
+    },
+    "positiveTerms": {
+        "womankind": {
+            "startIndex": 15,
+            "endIndex": 21,
+            "bonusPoints": 1
+        }
+    },
+    "score": {
+        "value": 50,
+        "grade": "F",
+        "description": "This is unacceptable. We forbid you from sending this text to anyone or anywhere.",
+        "failed": true
+    }
+}
