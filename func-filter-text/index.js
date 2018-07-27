@@ -39,13 +39,26 @@ function CalculateScore(req) {
                 problemPoints: req.Response.problematicTerms.reduce(sumProblemPoints, 0),
                 positivePoints: req.Response.positiveTerms.reduce(sumPositivePoints, 0),
                 get netPoints() { return this.problemPoints - this.positivePoints; },
-                get rawScore() { return this.netPoints / this.wordCount; },
+                get rawScore() { 
+                    if (this.netPoints > 999999) {
+                        return 0;
+                    } else if (this.netPoints > this.wordCount) {
+                        return .65;
+                    } else {
+                        return 1 - (this.netPoints / this.wordCount); 
+                    }
+                },
                 get normalizedScore() {
-                    // todo: need to normalize rawScore into scale 0-100
+                    let maxScore = ((95 - this.netPoints - req.Response.problematicTerms.length));
+                    let modifier = this.rawScore;
+                    if (modifier > 1) {
+                        return Math.min(100, maxScore + this.positivePoints);
+                    }
+                    return Math.min(100, Math.max(0, maxScore * modifier));
                 },
                 grade: null, // todo: need to get grade range
                 description: null, // todo: need to write grade descriptions
-                wordCount: WordCount(req.FilterTextRequest.InputText)
+                wordCount: WordCount(req.FilterTextRequest.InputText),
             };                        
             return resolve(req);
 
