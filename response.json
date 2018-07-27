@@ -1,15 +1,16 @@
 {
     "originalText": "That girl is so shrill.",
-    "problematicTerms": {
-        "shrill": {
+    "problematicTerms": [
+        {
+            "term": "shrill",
             "startIndex": 15,
             "endIndex": 21,
-            "problemPoints": 50,
+            "ProblemPoints": 50,
             "GNReplacement": "",
-            "femReplacement": "",
-            "warningMessage": "This is not OK!"
+            "FemReplacement": "",
+            "WarningMessage": "This is not OK!"
         }
-    },
+    ],
     "positiveTerms": {
         "womankind": {
             "startIndex": 15,
@@ -24,3 +25,4 @@
         "failed": true
     }
 }
+
