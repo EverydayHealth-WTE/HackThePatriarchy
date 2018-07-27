@@ -4,8 +4,8 @@ exports.PositiveSearchList = [
     "women and men",
     "girls and boys",
     "wife and husband",
+    
     "wives and husbands",
-    "wife and husband",
     "daughter and son",
     "daughters and sons",
     "her and his",
@@ -33,7 +33,6 @@ exports.PositiveDatabase = {
     "girl and boy": { "BonusPoints": 2 },
     "women and men": { "BonusPoints": 2 },
     "girls and boys": { "BonusPoints": 2 },
-    "wife and husband": { "BonusPoints": 2 },
     "wives and husbands": { "BonusPoints": 2 },
     "wife and husband": { "BonusPoints": 3 },
     "daughter and son": { "BonusPoints": 2 },
