@@ -62,7 +62,7 @@ function ProcessText(req) {
                 positiveTerms: [],
                 score: {}
             };
-
+            let foundPhrases = [];
             if (req.FilterTextRequest.InputText.length > 0) {
                 // search through each term in ProblematicSearchList
                 PHRASES.ProblematicSearchList.forEach((searchTerm) => {
@@ -71,6 +71,8 @@ function ProcessText(req) {
                     // search entire string for all matches
                     while ((matches = re.exec(req.FilterTextRequest.InputText)) !== null) {
                         console.log(`Found "${searchTerm}" at index ${matches.index}`);
+                        // create list of found phrases
+                        foundPhrases.push(searchTerm);
                         // create found term object to return in API response
                         let foundTerm = {
                             term: searchTerm,
@@ -90,6 +92,10 @@ function ProcessText(req) {
                     // search entire string for all matches
                     while ((matches = re.exec(req.FilterTextRequest.InputText)) !== null) {
                         console.log(`Found "${searchTerm}" at index ${matches.index}`);
+                        // check if word is a part of found phrases
+                        if (foundPhrases.some((phrase) => { return new RegExp(searchTerm, "gi").test(phrase); } )) {
+                            continue;
+                        }
                         // create found term object to return in API response
                         let foundTerm = {
                             term: searchTerm,
@@ -128,7 +134,7 @@ function ProcessText(req) {
                     let matches;
                     // search entire string for all matches
                     while ((matches = re.exec(req.FilterTextRequest.InputText)) !== null) {
-                        console.log(`Found "${searchTerm}" at index ${matches.index}`);
+                        console.log(`Found "${searchTerm}" at index ${matches.index}`);                        
                         // create found term object to return in API response
                         let foundTerm = {
                             term: searchTerm,
