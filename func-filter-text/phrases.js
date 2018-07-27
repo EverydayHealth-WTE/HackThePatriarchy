@@ -4,6 +4,7 @@ exports.PositiveSearchList = [
     "women and men",
     "girls and boys",
     "wife and husband",
+    
     "wives and husbands",
     "daughter and son",
     "daughters and sons",
