@@ -1,5 +1,6 @@
 // import
 const PHRASES = require("./phrases.js");
+const WORDS = require("./words.js");
 
 // lambda entry point
 exports.main = function(lambdaReq, success, fail) {
@@ -8,6 +9,7 @@ exports.main = function(lambdaReq, success, fail) {
                 
         ValidateRequestParams(lambdaReq)
             .then(ProcessText)
+            .then(CalculateScore)
             .then((req) => {                
                 lambdaReq.response.body = "" + JSON.stringify(req.Response);                
                 success(lambdaReq.response);
@@ -19,12 +21,46 @@ exports.main = function(lambdaReq, success, fail) {
     }
 };
 
+function WordCount(str) {
+    return str
+      .split(' ')
+      .filter(function(n) { return n != '' })
+      .length;
+}
+
+function CalculateScore(req) {
+    return new Promise(function(resolve, reject) {
+        try {
+            
+            let sumProblemPoints = (sum, problematicTerm) => sum + problematicTerm.ProblemPoints;
+            let sumPositivePoints = (sum, positiveTerm) => sum + positiveTerm.BonusPoints;
+
+            req.Response.score = {
+                problemPoints: req.Response.problematicTerms.reduce(sumProblemPoints, 0),
+                positivePoints: req.Response.positiveTerms.reduce(sumPositivePoints, 0),
+                get netPoints() { return this.problemPoints - this.positivePoints; },
+                get rawScore() { return this.netPoints / this.wordCount; },
+                get normalizedScore() {
+                    // todo: need to normalize rawScore into scale 0-100
+                },
+                grade: null, // todo: need to get grade range
+                description: null, // todo: need to write grade descriptions
+                wordCount: WordCount(req.FilterTextRequest.InputText)
+            };                        
+            return resolve(req);
+
+        } catch (e) { reject(e); }
+    });
+}
+
 function ProcessText(req) {
     return new Promise(function(resolve, reject) {
         try {
             req.Response = {
                 originalText: req.FilterTextRequest.InputText,
-                problematicTerms: []
+                problematicTerms: [],
+                positiveTerms: [],
+                score: {}
             };
 
             if (req.FilterTextRequest.InputText.length > 0) {
@@ -46,6 +82,64 @@ function ProcessText(req) {
                         foundTerm = Object.assign(foundTerm, termData);
                         // add found term object to API response
                         req.Response.problematicTerms.push(foundTerm)
+                    }
+                });
+                WORDS.ProblematicSearchList.forEach((searchTerm) => {
+                    let re = new RegExp("\\b"+searchTerm+"\\b", "gi");
+                    let matches;
+                    // search entire string for all matches
+                    while ((matches = re.exec(req.FilterTextRequest.InputText)) !== null) {
+                        console.log(`Found "${searchTerm}" at index ${matches.index}`);
+                        // create found term object to return in API response
+                        let foundTerm = {
+                            term: searchTerm,
+                            startIndex: matches.index,
+                            endIndex: (matches.index + searchTerm.length)
+                        };
+                        // get the term data from 'database' (replacement terms, problem points, etc.)
+                        let termData = WORDS.ProblematicDatabase[searchTerm];
+                        foundTerm = Object.assign(foundTerm, termData);
+                        // add found term object to API response
+                        req.Response.problematicTerms.push(foundTerm)
+                    }
+                });
+                // search through each term in Positive
+                PHRASES.PositiveSearchList.forEach((searchTerm) => {
+                    let re = new RegExp(searchTerm, "gi");
+                    let matches;
+                    // search entire string for all matches
+                    while ((matches = re.exec(req.FilterTextRequest.InputText)) !== null) {
+                        console.log(`Found "${searchTerm}" at index ${matches.index}`);
+                        // create found term object to return in API response
+                        let foundTerm = {
+                            term: searchTerm,
+                            startIndex: matches.index,
+                            endIndex: (matches.index + searchTerm.length)
+                        };
+                        // get the term data from 'database' (positive points)
+                        let termData = PHRASES.PositiveDatabase[searchTerm];
+                        foundTerm = Object.assign(foundTerm, termData);
+                        // add found term object to API response
+                        req.Response.positiveTerms.push(foundTerm)
+                    }
+                });
+                WORDS.PositiveSearchList.forEach((searchTerm) => {
+                    let re = new RegExp("\\b"+searchTerm+"\\b", "gi");
+                    let matches;
+                    // search entire string for all matches
+                    while ((matches = re.exec(req.FilterTextRequest.InputText)) !== null) {
+                        console.log(`Found "${searchTerm}" at index ${matches.index}`);
+                        // create found term object to return in API response
+                        let foundTerm = {
+                            term: searchTerm,
+                            startIndex: matches.index,
+                            endIndex: (matches.index + searchTerm.length)
+                        };
+                        // get the term data from 'database' (positive points)
+                        let termData = WORDS.PositiveDatabase[searchTerm];
+                        foundTerm = Object.assign(foundTerm, termData);
+                        // add found term object to API response
+                        req.Response.positiveTerms.push(foundTerm)
                     }
                 });
             }
